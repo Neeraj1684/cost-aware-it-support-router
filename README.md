@@ -15,6 +15,6 @@ An AI-powered support ticket routing system that combines:
 - ✅ Ticket Embeddings
 - ✅ Unsupervised Clustering
 - ✅ Supervised ML Router
-- ⏳ FastAPI Backend
+- ✅ FastAPI Backend
 - ⏳ LangChain Integration
 - ⏳ Dashboard
