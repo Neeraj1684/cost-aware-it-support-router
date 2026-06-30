@@ -1,0 +1,19 @@
+# Backend
+fastapi
+uvicorn
+pydantic
+
+# Data Science
+pandas
+numpy
+scikit-learn
+xgboost
+joblib
+
+# NLP
+sentence-transformers
+transformers
+torch
+
+# Visualization
+matplotlib
