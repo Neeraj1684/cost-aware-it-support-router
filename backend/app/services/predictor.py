@@ -15,7 +15,7 @@ def predict_ticket(subject, body, manager):
 
     confidence = float(np.max(probabilities))
 
-    predicted_cluster = int(np.argmax(confidence))
+    predicted_cluster = int(np.argmax(probabilities))
 
     latency = round((time.time() - start_time) * 1000, 2)
 

@@ -5,27 +5,37 @@ from ml_pipeline.config import MODELS_DIR
 from backend.app.model_manager import manager
 from backend.app.api.routes import router
 import joblib
+import logging
+import asyncio
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    
-    print("Loading Setence Transformer...")
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-    manager.embedder = SentenceTransformer(
+def load_models():
+    logger.info("Loading Setence Transformer...")
+
+    embedder = SentenceTransformer(
         "paraphrase-multilingual-MiniLM-L12-v2"
     )
 
-    print("Loading ML router...")
+    logger.info("Loading ML router...")
 
-    manager.router_model = joblib.load(
+    router_model = joblib.load(
         MODELS_DIR / "fast_router_model.joblib"
     )
 
-    print("Backend is ready!")
+    return embedder, router_model
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    manager.embedder, manager.router_model = await asyncio.to_thread(load_models)
+
+    logger.info("Backend is ready!")
 
     yield
 
-    print("Shutting down backend...")
+    logger.info("Shutting down backend...")
 
 app = FastAPI(
     title = "Cost-Aware IT Support Router",
