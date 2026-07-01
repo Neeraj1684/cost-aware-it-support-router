@@ -15,9 +15,9 @@ df = df.dropna(subset=['combined_text'])
 print("Initializing local HuggingFace embedding model on GPU...")
 embedding_model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 
-df_sample = df.sample(n=5000, random_state=42).copy()
+df_sample = df.copy()
 print("Generating semantic embeddings for 5000 rows...")
-embeddings = embedding_model.encode(df_sample['combined_text'].tolist(), show_progress_bar=True)
+embeddings = embedding_model.encode(df_sample['combined_text'].tolist(), show_progress_bar=True, batch_size=64)
 print(f"Embedding Matrix Shape: {embeddings.shape}")
 
 inertia = []
@@ -51,6 +51,37 @@ kmeans = KMeans(
 )
 df_sample['cluster_label'] = kmeans.fit_predict(embeddings)
 
+joblib.dump(kmeans, ARTIFACTS_DIR / "kmeans_model.joblib")
+
+print("\n" + "=" * 80)
+print("DETAILED CLUSTER INSPECTION")
+print("=" * 80)
+
+for cluster_id in sorted(df_sample['cluster_label'].unique()):
+
+    print(f"\n\nCLUSTER {cluster_id}")
+    print("-" * 60)
+
+    cluster_df = df_sample[df_sample['cluster_label'] == cluster_id]
+
+    print("\nTop Queues:")
+    print(cluster_df['queue'].value_counts().head())
+
+    print("\nTop Types:")
+    print(cluster_df['type'].value_counts().head())
+
+    print("\nTop Tags:")
+    print(cluster_df['tag_1'].value_counts().head())
+
+    print("\nRandom Ticket Samples:")
+    samples = cluster_df.sample(5, random_state=42)
+
+    for _, row in samples.iterrows():
+        print(f"\nSubject: {row['subject']}")
+
+print("\n\nCluster Sizes:")
+print(df_sample['cluster_label'].value_counts().sort_index())
+
 for cluster_id in range(optimal_k):
     print(f"\n--- INSPECTING CLUSTER {cluster_id} ---")
     sample_tickets = df_sample[df_sample['cluster_label'] == cluster_id]['combined_text'].head(3).tolist()
@@ -62,6 +93,8 @@ validation_matrix = pd.crosstab(df_sample['cluster_label'], df_sample['queue'])
 print("\n\n",validation_matrix)
 
 print("\nSaving data artifacts for the supervised training pipeline...")
-joblib.dump(embeddings, ARTIFACTS_DIR / "embeddings_5k.joblib")
-joblib.dump(df_sample['cluster_label'].values, ARTIFACTS_DIR / "cluster_labels_5k.joblib")
+joblib.dump(embeddings, ARTIFACTS_DIR / "embeddings.joblib")
+joblib.dump(df_sample["cluster_label"].values,
+            ARTIFACTS_DIR / "cluster_labels.joblib")
+joblib.dump(df_sample, ARTIFACTS_DIR / "clustered_dataset.joblib")
 print("Saved! You can now use train_router.py without regenerating embeddings.")

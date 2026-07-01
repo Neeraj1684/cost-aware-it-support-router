@@ -4,10 +4,17 @@ class TicketRequest(BaseModel):
     subject: str
     body: str
 
-class RoutingResponse(BaseModel):
-    routed_by: str
-    assigned_queue: str
-    confidence_score: float
-    cost_incurred: str
+class RoutingInfo(BaseModel):
+    engine: str
+    queue: str
+    confidence: float
+
+class Metrics(BaseModel):
     latency_ms: float
-    requires_human_review: bool
+    llm_used: bool
+    cost_usd: float
+    tokens_used: int
+
+class RoutingResponse(BaseModel):
+    routing: RoutingInfo
+    metrics: Metrics

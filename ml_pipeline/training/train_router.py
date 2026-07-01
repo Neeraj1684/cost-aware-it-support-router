@@ -10,8 +10,8 @@ from sklearn.metrics import accuracy_score, f1_score, classification_report
 from ml_pipeline.config import MODELS_DIR, ARTIFACTS_DIR
 
 print("Loading embeddings from the disk...")
-X = joblib.load(ARTIFACTS_DIR / "embeddings_5k.joblib")
-y = joblib.load(ARTIFACTS_DIR / "cluster_labels_5k.joblib")
+X = joblib.load(ARTIFACTS_DIR / "embeddings.joblib")
+y = joblib.load(ARTIFACTS_DIR / "cluster_labels.joblib")
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 

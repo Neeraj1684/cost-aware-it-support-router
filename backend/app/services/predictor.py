@@ -20,20 +20,30 @@ def predict_ticket(subject, body, manager):
     latency = round((time.time() - start_time) * 1000, 2)
 
     if confidence >= CONFIDENCE_THRESHOLD:
-        return{
-            "routed_by": "Machine Learning",
-            "assigned_queue": CATEGORY_MAP[predicted_cluster],
-            "confidence_score": round(confidence, 4),
-            "cost_incurred": "Rs. 0.00",
-            "latency_ms": latency,
-            "requires_human_review": False
+        return {
+            "routing": {
+                "engine": "Machine Learning",
+                "queue": CATEGORY_MAP[predicted_cluster],
+                "confidence": round(confidence, 4)
+            },
+            "metrics": {
+                "latency_ms": latency,
+                "llm_used": False,
+                "cost_usd": 0.0,
+                "tokens_used": 0
+            }
         }
     
     return {
-        "routed_by": "LLM Fallback",
-        "assigned_queue": "Pending LLM Analysis",
-        "confidence_score": round(confidence, 4),
-        "cost_incurred": "Calculating...",
-        "latency_ms": latency,
-        "requires_human_review": True
+        "routing": {
+            "engine": "LLM Fallback",
+            "queue": "Pending LLM Analysis",
+            "confidence": round(confidence, 4)
+        },
+        "metrics": {
+            "latency_ms": latency,
+            "llm_used": True,
+            "cost_usd": 0.0,
+            "tokens_used": 0
+        }
     }

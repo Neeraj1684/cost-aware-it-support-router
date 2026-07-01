@@ -17,3 +17,8 @@ torch
 
 # Visualization
 matplotlib
+
+# langchain
+langchain
+langchain-google-genai
+python-dotenv
