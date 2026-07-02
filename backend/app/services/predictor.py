@@ -1,6 +1,6 @@
 import numpy as np
 import time
-from backend.app.constants import CATEGORY_MAP, CONFIDENCE_THRESHOLD
+from backend.app.constants import CONFIDENCE_THRESHOLD
 
 
 def predict_ticket(subject, body, manager):
@@ -23,7 +23,8 @@ def predict_ticket(subject, body, manager):
         return {
             "routing": {
                 "engine": "Machine Learning",
-                "queue": CATEGORY_MAP[predicted_cluster],
+                "cluster_id": predicted_cluster,
+                "queue": manager.category_map[predicted_cluster],
                 "confidence": round(confidence, 4)
             },
             "metrics": {

@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from sentence_transformers import SentenceTransformer
-from ml_pipeline.config import MODELS_DIR
+from ml_pipeline.config import MODELS_DIR, ARTIFACTS_DIR
 from backend.app.model_manager import manager
 from backend.app.api.routes import router
 import joblib
 import logging
 import asyncio
+import json
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,12 +25,21 @@ def load_models():
         MODELS_DIR / "fast_router_model.joblib"
     )
 
-    return embedder, router_model
+    with open(
+        ARTIFACTS_DIR / "category_map.json",
+        "r",
+        encoding="utf-8"
+    ) as f:
+        category_map = {
+            int(k): v for k,v in json.load(f).items()
+        }
+    
+    return embedder, router_model, category_map
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
-    manager.embedder, manager.router_model = await asyncio.to_thread(load_models)
+    (manager.embedder, manager.router_model, manager.category_map) = await asyncio.to_thread(load_models)
 
     logger.info("Backend is ready!")
 
