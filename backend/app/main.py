@@ -4,10 +4,15 @@ from sentence_transformers import SentenceTransformer
 from ml_pipeline.config import MODELS_DIR, ARTIFACTS_DIR
 from backend.app.model_manager import manager
 from backend.app.api.routes import router
+from langchain_google_genai import ChatGoogleGenerativeAI
+from dotenv import load_dotenv
+import os
 import joblib
 import logging
 import asyncio
 import json
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -33,13 +38,19 @@ def load_models():
         category_map = {
             int(k): v for k,v in json.load(f).items()
         }
+
+    logger.info("Initializing Langchain LLM fallback...")
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-3.1-flash-lite",
+        temperature=0
+    )
     
-    return embedder, router_model, category_map
+    return embedder, router_model, category_map, llm
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
-    (manager.embedder, manager.router_model, manager.category_map) = await asyncio.to_thread(load_models)
+    (manager.embedder, manager.router_model, manager.category_map, manager.llm) = await asyncio.to_thread(load_models)
 
     logger.info("Backend is ready!")
 

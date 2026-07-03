@@ -69,26 +69,27 @@ Body: {row['body']}
         [HumanMessage(content=prompt)]
     )
 
-    # print(type(response.content))
-    # print(response.content)
+    print(type(response.content))
+    print(response.content)
+    print(response.usage_metadata)
 
-    category = response.content[0]["text"].strip()
+#     category = response.content[0]["text"].strip()
 
-    category_map[int(cluster_id)] = category
+#     category_map[int(cluster_id)] = category
 
-    print(f"Cluster {cluster_id} -> {category}")
+#     print(f"Cluster {cluster_id} -> {category}")
 
 
-with open(
-    ARTIFACTS_DIR / "category_map.json",
-    "w",
-    encoding="utf-8"
-) as f:
-    json.dump(
-        category_map,
-        f,
-        indent=4,
-        ensure_ascii=False
-    )
+# with open(
+#     ARTIFACTS_DIR / "category_map.json",
+#     "w",
+#     encoding="utf-8"
+# ) as f:
+#     json.dump(
+#         category_map,
+#         f,
+#         indent=4,
+#         ensure_ascii=False
+#     )
 
-print("\nSaved category_map.json")
+# print("\nSaved category_map.json")

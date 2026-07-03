@@ -1,6 +1,7 @@
 import numpy as np
 import time
 from backend.app.constants import CONFIDENCE_THRESHOLD
+from langchain_core.messages import HumanMessage
 
 
 def predict_ticket(subject, body, manager):
@@ -35,16 +36,46 @@ def predict_ticket(subject, body, manager):
             }
         }
     
+    valid_queues = list(manager.category_map.values())
+
+    prompt = f"""
+
+    You are an expert IT Support Dispatcher.
+    Classify this ticket into EXACTLY ONE of these queues:
+    {valid_queues}
+    
+    Ticket Subject: {subject}
+    Ticket Body: {body}
+    
+    Return ONLY the exact queue name.
+
+"""
+    # llm_start = time.time()
+    response = manager.llm.invoke([HumanMessage(content=prompt)])
+
+    if isinstance(response.content, list):
+        assigned_queue = response.content[0]["text"].strip()
+    else:
+        assigned_queue = response.content.strip()
+
+    # Check if usage_metadata exists and grab total_tokens directly
+    if hasattr(response, 'usage_metadata') and response.usage_metadata:
+        tokens = response.usage_metadata.get('total_tokens', 0)
+    else:
+        tokens = 0
+
+    total_latency = round((time.time() - start_time) * 1000, 2)
+    
     return {
         "routing": {
-            "engine": "LLM Fallback",
-            "queue": "Pending LLM Analysis",
+            "engine": "LLM Fallback (Gemini via LangChain)",
+            "queue": assigned_queue,
             "confidence": round(confidence, 4)
         },
         "metrics": {
-            "latency_ms": latency,
+            "latency_ms": total_latency,
             "llm_used": True,
             "cost_usd": 0.0,
-            "tokens_used": 0
+            "tokens_used": tokens
         }
     }
