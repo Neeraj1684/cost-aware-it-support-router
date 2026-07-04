@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import os
 from backend.app.constants import CONFIDENCE_THRESHOLD
 from langchain_core.messages import HumanMessage
 
@@ -65,6 +66,9 @@ def predict_ticket(subject, body, manager):
         tokens = 0
 
     total_latency = round((time.time() - start_time) * 1000, 2)
+
+    cost_per_million = float(os.getenv("GEMINI_FLASH_COST_PER_1M", 0.15))
+    calculated_cost = (tokens / 1_000_000) * cost_per_million
     
     return {
         "routing": {
@@ -75,7 +79,7 @@ def predict_ticket(subject, body, manager):
         "metrics": {
             "latency_ms": total_latency,
             "llm_used": True,
-            "cost_usd": 0.0,
+            "cost_usd": round(calculated_cost, 6),
             "tokens_used": tokens
         }
     }

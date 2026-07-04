@@ -6,6 +6,7 @@ from backend.app.model_manager import manager
 from backend.app.api.routes import router
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
+from backend.app.db.database import init_db
 import os
 import joblib
 import logging
@@ -49,6 +50,9 @@ def load_models():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+
+    logger.info("Initializing Database...")
+    init_db()
 
     (manager.embedder, manager.router_model, manager.category_map, manager.llm) = await asyncio.to_thread(load_models)
 
