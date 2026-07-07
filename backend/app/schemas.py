@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
+from datetime import datetime
 
 class UserCreate(BaseModel):
     username: str
@@ -30,3 +31,29 @@ class Metrics(BaseModel):
 class RoutingResponse(BaseModel):
     routing: RoutingInfo
     metrics: Metrics
+
+class TicketStatusUpdate(BaseModel):
+    status: str
+
+class TicketLogRead(BaseModel):
+    id: int
+    subject: str
+    body: str
+    engine: str
+    assigned_queue: str
+    confidence_score: float
+    latency_ms: float
+    llm_used: bool
+    tokens_used: int
+    cost_usd: float
+    status: str
+    created_at: datetime
+    user_id: int | None = None
+
+    model_config = {
+        "from_attributes": True
+    }
+
+class PaginatedTickets(BaseModel):
+    items: List[TicketLogRead]
+    total:int

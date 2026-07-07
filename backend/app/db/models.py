@@ -8,6 +8,7 @@ class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(unique=True, index=True)
     hashed_password: str
+    role: str = Field(default="user")
 
 class TicketLog(SQLModel, table=True):
     __tablename__ = "ticket_logs"
@@ -22,5 +23,6 @@ class TicketLog(SQLModel, table=True):
     llm_used: bool
     tokens_used: int
     cost_usd: float
+    status: str = Field(default="open")
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     user_id: Optional[int] = Field(default=None, foreign_key="users.id")
