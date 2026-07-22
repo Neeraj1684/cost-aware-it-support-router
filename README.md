@@ -1,93 +1,217 @@
-# 🚀 Cost-Aware IT Support Router
+# 🚀 Cost-Aware AI IT Support Router
 
-An enterprise-grade, cost-aware AI ticketing system that intelligently routes IT support requests. It utilizes a hybrid AI architecture—employing a fast, free local Machine Learning model (XGBoost) as the primary router, and seamlessly falling back to a Large Language Model (Gemini) only when necessary.
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
+![Next.js](https://img.shields.io/badge/Next.js-14-black)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue)
+![XGBoost](https://img.shields.io/badge/XGBoost-ML-orange)
+![LangChain](https://img.shields.io/badge/LangChain-AI-success)
+![LangSmith](https://img.shields.io/badge/LangSmith-Tracing-blueviolet)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
 
-By tracking API costs, latency, and agent corrections, this system demonstrates advanced **FinOps**, **Human-in-the-Loop (HITL)** active learning, and dynamic model retraining.
+A **production-inspired, cost-aware AI ticket routing system** that intelligently routes IT support requests using a hybrid AI architecture.
+
+Instead of sending every ticket to an expensive Large Language Model, the system first uses a lightweight local **XGBoost classifier** for near-instant predictions. Only uncertain requests are escalated to **Google Gemini**, dramatically reducing inference cost while maintaining routing accuracy.
+
+Beyond intelligent routing, the project demonstrates modern AI engineering practices including:
+
+- 💰 FinOps (AI cost optimization)
+- 🤖 Hybrid AI (Traditional ML + LLM)
+- 👨‍💻 Human-in-the-Loop (HITL)
+- 🔄 Dynamic model retraining
+- 📊 AI observability with LangSmith
+- 🔐 Role-Based Access Control (RBAC)
+- 🐳 Dockerized full-stack deployment
+
+The application includes dedicated dashboards for **Users, Department Agents, Administrators**, along with a **FinOps Dashboard** for monitoring AI performance, API costs, and routing analytics.
 
 ---
 
-## ✨ Key Features
+# 💡 Why this project?
 
-- **Hybrid AI Routing Engine:** Uses `SentenceTransformers` + `XGBoost` for instant, **$0.00 cost routing**. If the ML model's confidence is below a configurable threshold, it escalates to a Large Language Model for zero-shot classification.
-- **FinOps Dashboard:** Tracks total LLM API spend, estimated cost savings, ML autopilot success rate, latency comparisons, and routing analytics in real time.
-- **Human-in-the-Loop (HITL) Retraining:** Department agents can manually correct misrouted tickets. An admin can trigger background retraining that merges corrections with the original dataset, retrains the XGBoost model, and hot-swaps it into memory with **zero API downtime**.
+Large Language Models are powerful—but they're also **slower and significantly more expensive** than traditional machine learning models.
+
+This project explores a production-style hybrid AI approach where:
+
+- Most tickets are classified using a fast local ML model.
+- Only uncertain tickets are escalated to an LLM.
+- Every LLM invocation is monitored for latency and cost.
+- Human corrections continuously improve the routing model.
+
+The result is an AI ticket router that is **cheaper, faster, observable, and continuously improving**.
+
+---
+
+# ✨ Key Features
+
+- **Hybrid AI Routing Engine:** Uses `SentenceTransformers` + `XGBoost` for instant, **$0.00 cost routing**. If the ML model's confidence is below a configurable threshold, the request is automatically escalated to Google Gemini.
+- **FinOps Dashboard:** Tracks total LLM API spend, estimated cost savings, ML autopilot success rate, latency comparisons, routing analytics, and model performance in real time.
+- **Human-in-the-Loop (HITL):** Department agents can manually correct misrouted tickets, allowing the system to continuously improve through human feedback.
+- **Dynamic Model Retraining:** Administrators can trigger a background retraining job that merges agent corrections with the original dataset, retrains the XGBoost model, and hot-swaps it into memory with **zero API downtime**.
 - **Role-Based Access Control (RBAC):** Three user roles (Admin, Agent, Standard User) with dedicated dashboards and secure API endpoints.
+- **AI Observability:** Integrated LangSmith tracing provides visibility into prompt execution, latency, token usage, and LLM behavior.
 - **Full-Stack Dockerization:** Frontend, backend, and PostgreSQL database are fully containerized for one-command deployment.
 
 ---
 
-## 🛠️ Architecture & Tech Stack
+# 🛠️ Architecture & Tech Stack
 
-### Frontend
+## Frontend
+
 - Next.js 14
 - React
 - Tailwind CSS
 - NextAuth (JWT Authentication)
 - Lucide Icons
 
-### Backend
+## Backend
+
 - FastAPI
 - Python
 - SQLModel (SQLAlchemy)
 - Pydantic
 
-### Database
+## Database
+
 - PostgreSQL
 
-### Machine Learning
+## Machine Learning
+
 - XGBoost
-- Scikit-learn
 - SentenceTransformers (Hugging Face)
+- Scikit-learn
 
-### LLM Integration
+## LLM & AI Observability
+
+- Google Gemini 2.5 Flash
 - LangChain
-- LiteLLM
-- Google Gemini Pro
+- LangSmith
 
-### Infrastructure
+## Infrastructure
+
 - Docker
 - Docker Compose
 
 ---
 
-## 🧠 How the Hybrid AI Engine Works
+# 🧠 Hybrid AI Workflow
 
-1. **Ticket Submission**
-   - The user submits a subject and description for an IT issue.
-
-2. **Text Embedding**
-   - The backend generates a vector embedding using a lightweight local NLP model.
-
-3. **Primary Prediction**
-   - The XGBoost classifier predicts the target department and outputs a confidence score.
-
-4. **Decision Logic**
-   - **Confidence ≥ 75%**
-     - Ticket is routed using the local ML model.
-     - **Cost:** `$0.00`
-     - **Latency:** ~60 ms
-
-   - **Confidence < 75%**
-     - Ticket is escalated to the Gemini LLM.
-     - **Cost:** ~$0.002/request
-     - **Latency:** ~1400 ms
-
-5. **Analytics Logging**
-   - Routing engine, confidence, token usage, API cost, and latency are logged to PostgreSQL for the FinOps dashboard.
+```text
+User Ticket
+      │
+      ▼
+Sentence Embedding
+      │
+      ▼
+XGBoost Prediction
+      │
+      ▼
+Confidence Score
+      │
+ ┌────┴──────────────┐
+ │                   │
+ │ Confidence ≥ 75%  │ Confidence < 75%
+ ▼                   ▼
+Route via ML     Gemini Flash
+Cost: $0.00      via LangChain
+Latency: ~60ms         │
+                        ▼
+               LangSmith Trace
+                        │
+                        ▼
+             PostgreSQL Analytics
+```
 
 ---
 
-## 🚀 Installation & Setup
+# ⚙️ How the Hybrid AI Engine Works
 
-### Prerequisites
+1. **Ticket Submission**
+   - The user submits a subject and detailed description of an IT issue.
+
+2. **Text Embedding**
+   - A lightweight local SentenceTransformer model converts the ticket into a semantic vector embedding.
+
+3. **Primary Prediction**
+   - The XGBoost classifier predicts the appropriate department queue and returns a confidence score.
+
+4. **Confidence Evaluation**
+
+   - **Confidence ≥ 75%**
+     - Ticket is routed using the local ML model.
+     - **Estimated Cost:** `$0.00`
+     - **Average Latency:** ~60 ms
+
+   - **Confidence < 75%**
+     - Ticket is automatically escalated to Google Gemini.
+     - **Estimated Cost:** ~$0.002/request
+     - **Average Latency:** ~1400 ms
+
+5. **Analytics Logging**
+   - Routing engine, confidence score, token usage, API cost, and latency are stored in PostgreSQL for FinOps analytics.
+
+---
+
+# 🔍 AI Observability
+
+The project integrates **LangSmith** to trace and monitor every LLM invocation executed through LangChain.
+
+Current observability includes:
+
+- Prompt inspection
+- Response inspection
+- LLM latency monitoring
+- Token usage tracking
+- End-to-end execution traces
+- Easier debugging of AI routing decisions
+
+Since the primary router is the local XGBoost model, LangSmith is primarily used whenever the system falls back to Google Gemini.
+
+---
+
+# 📊 System Architecture
+
+```text
+                         User Ticket
+                              │
+                              ▼
+               SentenceTransformer Embedding
+                              │
+                              ▼
+                     XGBoost Classifier
+                              │
+                 ┌────────────┴────────────┐
+                 │                         │
+        Confidence ≥ 75%          Confidence < 75%
+                 │                         │
+                 ▼                         ▼
+          Route via ML          Google Gemini Flash
+          Cost: $0.00             via LangChain
+          Latency: ~60ms                 │
+                                         ▼
+                                 LangSmith Tracing
+                                         │
+                                         ▼
+                               PostgreSQL Analytics
+                                         │
+                                         ▼
+                            FinOps Dashboard & Reports
+```
+
+---
+
+# 🚀 Installation & Setup
+
+## Prerequisites
 
 - Docker
 - Docker Compose
 - Google Gemini API Key
+- LangSmith API Key (optional, for AI tracing)
 
 ---
 
-### 1. Clone the Repository
+## 1. Clone the Repository
 
 ```bash
 git clone https://github.com/yourusername/cost-aware-it-support-router.git
@@ -96,28 +220,49 @@ cd cost-aware-it-support-router
 
 ---
 
-### 2. Configure Environment Variables
+## 2. Configure Environment Variables
 
 Create a `.env` file in the project root:
 
 ```env
-# Database
-DATABASE_URL=postgresql://postgres:postgres@db:5432/it_support_router
+# ===========================
+# Google Gemini
+# ===========================
+
+GOOGLE_API_KEY=your_google_api_key
+
+# Cost Configuration
+GEMINI_FLASH_COST_PER_1M=0.15
+
+# ===========================
+# LangSmith (Tracing)
+# ===========================
+
+LANGCHAIN_TRACING_V2=true
+LANGCHAIN_ENDPOINT=https://api.smith.langchain.com
+LANGCHAIN_API_KEY=your_langsmith_api_key
+LANGCHAIN_PROJECT=cost-aware-it-support-router
+
+# ===========================
+# PostgreSQL
+# ===========================
+
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
+POSTGRES_PASSWORD=your_password
 POSTGRES_DB=it_support_router
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5433
 
-# NextAuth
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your_super_secret_key_here
+# ===========================
+# Backend
+# ===========================
 
-# LLM API
-GEMINI_API_KEY=your_gemini_api_key_here
+SECRET_KEY=your_secret_key
 ```
 
 ---
 
-### 3. Build & Run
+## 3. Build & Run
 
 ```bash
 docker compose up --build -d
@@ -125,15 +270,15 @@ docker compose up --build -d
 
 ---
 
-### Access the Application
+## 🌐 Access the Application
 
-**Frontend**
+### Frontend
 
 ```
 http://localhost:3000
 ```
 
-**Backend API Docs**
+### Backend API Documentation
 
 ```
 http://localhost:8000/docs
@@ -141,98 +286,282 @@ http://localhost:8000/docs
 
 ---
 
-## 🎮 Usage Guide
+# 📊 Dashboards
 
-### 1. Bootstrap the Admin
+The application provides dedicated dashboards tailored to each user role.
 
-Open the FastAPI Swagger UI:
+## 👤 Standard User Dashboard
 
-```
-http://localhost:8000/docs
-```
-
-Use the endpoint:
-
-```
-POST /api/v1/auth/register
-```
-
-Create an account with the username:
-
-```
-luffy
-```
-
-> **Note:** The username `luffy` is hardcoded as the master administrator.
+- Submit new IT support tickets
+- Track ticket status
+- View ticket history
+- Receive routed department information
 
 ---
 
-### 2. Create Department Agents
+## 👨‍🔧 Department Agent Dashboard
 
-1. Log into the frontend as **luffy**.
-2. Open **Manage Users & Agents**.
-3. Create department agents (for example, **Billing & Finance**).
-
----
-
-### 3. Generate Tickets
-
-Log in as a standard user and submit various IT support tickets.
+- View assigned department tickets
+- Correct incorrectly routed tickets
+- Update ticket status
+- Provide Human-in-the-Loop feedback
 
 ---
 
-### 4. Trigger Human-in-the-Loop Learning
+## 👑 Administrator Dashboard
 
-#### Agent
-
-- Review assigned tickets.
-- Correct any misrouted ticket using the department dropdown.
-
-#### Admin
-
-- Log back in as **luffy**.
-- Click **Retrain AI Router**.
-
-The backend will:
-
-- Merge agent corrections
-- Retrain the XGBoost model
-- Replace the in-memory model
-- Continue serving requests without downtime
+- Manage Users
+- Manage Department Agents
+- Trigger AI retraining
+- Monitor routing statistics
+- View system activity
 
 ---
 
-## 📊 What Makes This Project Different?
+## 💰 FinOps Dashboard
 
-- ✅ Hybrid AI (ML + LLM)
-- ✅ Cost-aware routing (FinOps)
-- ✅ Human-in-the-loop feedback system
-- ✅ Active learning & dynamic retraining
+Track the operational efficiency of the AI routing engine through real-time analytics:
+
+- Total LLM API Spend
+- Estimated Cost Savings
+- ML vs LLM Routing Ratio
+- Average ML Latency
+- Average LLM Latency
+- Autopilot Success Rate
+- Routing Engine Distribution
+- Token Usage Analytics
+
+---
+
+# 🎮 Usage Guide
+
+## 1. Initial Administrator Login
+
+On the first application startup, the backend automatically checks whether any users exist in the database.
+
+If the database is empty, it seeds a default administrator account:
+
+```text
+Username: admin
+Password: admin123
+```
+
+> **Note:** The admin account is created **only once** during the initial startup. If users already exist, the seeder is skipped.
+
+After logging in as **admin**, you can:
+
+- Create Department Agents
+- Create Standard Users
+- Manage the system
+- Trigger AI model retraining
+- Monitor the FinOps dashboard
+
+---
+
+## 2. Create Department Agents
+
+Log into the frontend as **admin** with password **admin123**.
+
+Navigate to:
+
+```
+Manage Users & Agents
+```
+
+Create department agents such as:
+
+- IT Support
+- Billing & Finance
+- Human Resources
+- Network Operations
+
+---
+
+## 3. Submit Tickets
+
+Log in as a standard user and submit different support requests.
+
+Examples:
+
+- Password reset
+- VPN not connecting
+- Payroll issue
+- Software installation
+- Email not syncing
+
+Observe how the router automatically selects the correct department.
+
+---
+
+## 4. Human-in-the-Loop Learning
+
+Department agents review routed tickets.
+
+If a ticket is incorrectly classified:
+
+- Select the correct department.
+- Save the correction.
+
+The correction is automatically stored in PostgreSQL for future model retraining.
+
+---
+
+## 5. Retrain the AI Router
+
+Log back in as **admin**.
+
+Click:
+
+```
+Retrain AI Router
+```
+
+The backend automatically performs:
+
+1. Load the original labeled dataset.
+2. Retrieve all human corrections from PostgreSQL.
+3. Merge corrections into the training dataset.
+4. Retrain the XGBoost routing model.
+5. Save the updated model.
+6. Hot-swap the model into memory.
+7. Continue serving requests without restarting the API.
+
+This enables continuous learning with **zero downtime**.
+
+---
+
+# 🔄 Human-in-the-Loop Learning Pipeline
+
+```text
+Agent Reviews Ticket
+          │
+          ▼
+Correct Department Selected
+          │
+          ▼
+Correction Saved to PostgreSQL
+          │
+          ▼
+Administrator Triggers Retraining
+          │
+          ▼
+Merge Original Dataset
+        +
+Agent Corrections
+          │
+          ▼
+Retrain XGBoost Model
+          │
+          ▼
+Save New Model
+          │
+          ▼
+Hot Swap into Memory
+          │
+          ▼
+Improved Future Predictions
+```
+
+---
+
+# 📂 Project Structure
+
+```text
+cost-aware-it-support-router/
+│
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── db/
+│   │   ├── services/
+│   │   ├── auth.py
+│   │   ├── model_manager.py
+│   │   └── main.py
+│   │
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── app/
+│   ├── public/
+│   ├── Dockerfile
+│   └── package.json
+│
+├── ml_pipeline/
+│   ├── data/
+│   ├── training/
+│   ├── models/
+│   └── artifacts/
+│
+├── docker-compose.yml
+├── .env
+└── README.md
+```
+
+---
+
+# 📊 What Makes This Project Different?
+
+Unlike traditional ticketing systems that rely entirely on LLMs, this project adopts a **hybrid AI architecture** that prioritizes speed, cost efficiency, and continuous learning.
+
+Key engineering highlights include:
+
+- ✅ Hybrid AI (Traditional ML + LLM)
+- ✅ Cost-aware AI routing (FinOps)
+- ✅ Human-in-the-Loop learning
+- ✅ Dynamic model retraining
 - ✅ Zero-downtime model updates
-- ✅ Enterprise RBAC
-- ✅ Real-time analytics dashboard
+- ✅ LangSmith AI observability
+- ✅ Role-Based Access Control (RBAC)
+- ✅ Real-time FinOps analytics
 - ✅ Dockerized full-stack deployment
+- ✅ Production-inspired AI architecture
 
 ---
 
-## 🔮 Future Enhancements
+# 🔮 Future Enhancements
 
-### Out-of-Distribution (OOD) Detection
+## 🧠 Out-of-Distribution (OOD) Detection
 
-Implement an absolute confidence threshold (e.g., **<40%**) to detect spam, irrelevant requests, or unknown issue types and automatically route them to a manual triage queue.
-
-### Retrieval-Augmented Generation (RAG)
-
-Connect the routing engine to an internal knowledge base so users receive instant troubleshooting suggestions before the ticket is routed to a human agent.
+Introduce an absolute confidence threshold (for example **<40%**) to identify spam, irrelevant, or previously unseen ticket categories and automatically route them to a manual triage queue.
 
 ---
 
-## 📄 License
+## 📚 Retrieval-Augmented Generation (RAG)
 
-This project is licensed under the MIT License.
+Integrate the routing engine with an internal knowledge base so users receive instant troubleshooting suggestions before their ticket is routed to a human agent.
 
 ---
 
-## ⭐ If you found this project interesting...
+## 📈 Explainable AI
 
-Consider giving it a **⭐ on GitHub**!
+Display confidence scores and feature importance to explain why the model selected a specific department.
+
+---
+
+## 📊 Advanced Monitoring
+
+Integrate Prometheus and Grafana for infrastructure monitoring alongside LangSmith traces.
+
+---
+
+## 🤖 Multi-Model Routing
+
+Experiment with multiple local ML models and dynamically choose the best routing strategy based on confidence and historical performance.
+
+---
+
+## 👨‍💻 Author
+
+Built as a portfolio project demonstrating modern AI engineering concepts, including:
+
+- Hybrid AI Systems
+- Machine Learning
+- Large Language Models
+- FinOps
+- Human-in-the-Loop Learning
+- LangSmith Observability
+- FastAPI
+- Next.js
+- PostgreSQL
+- Docker
